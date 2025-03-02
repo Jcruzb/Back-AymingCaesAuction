@@ -58,7 +58,6 @@ module.exports.activate = (req, res, next) => {
 };
 
 module.exports.me = (req, res, next) => {
-    console.log('entra en me')
     User.findById(req.currentUser.id)
         .then(user => {
             if (!user) return next(createError(HttpStatus.StatusCodes.NOT_FOUND, "User not found"));

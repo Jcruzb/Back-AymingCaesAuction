@@ -12,6 +12,11 @@ const BidSchema = new Schema({
         ref: 'User',
         required: [true, 'Se requiere asociar la oferta a un cliente']
     },
+    company:{
+        type:Schema.Types.ObjectId,
+        ref:'Company',
+        required:[true,'Se requiere el nombre de la compañia']
+    },
     bidPrice: {
         type: Number,
         required: [true, 'Se requiere un precio para la oferta']

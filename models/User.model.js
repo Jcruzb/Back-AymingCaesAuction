@@ -28,6 +28,11 @@ const userSchema = new Schema({
         minLength: [8, 'La contraseña debe tener mínimo 8 caracteres'],
         trim: true
     },
+    company:{
+        type: Schema.Types.ObjectId,
+        ref: 'Company',
+        required:[true, 'Se requiere seleccionar la empresa a la que pertenece']
+    },
     role: {
         type: String,
         enum: ROLE,

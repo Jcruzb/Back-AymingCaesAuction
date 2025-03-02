@@ -27,6 +27,8 @@ const projectRoutes = require('./routes/project.routes')
 app.use('/project', projectRoutes)
 const standarProjectRoutes = require('./routes/standarProject.routes')
 app.use('/standarProjects', standarProjectRoutes)
+const companyRoutes = require('./routes/company.routes');
+app.use('/api/companies', companyRoutes);
 
 
 const PORT = process.env.PORT

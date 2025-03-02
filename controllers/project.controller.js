@@ -3,8 +3,6 @@ const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
 
 module.exports.createProject = (req, res, next) => {
-    console.log('entraaaaaaaaa')
-    console.log(req.body)
     Project.create(req.body)
         .then(project => {
             res.status(HttpStatus.StatusCodes.CREATED).json(project);
@@ -13,6 +11,7 @@ module.exports.createProject = (req, res, next) => {
 };
 
 module.exports.getProjects = (req, res, next) => {
+    console.log('Entraaaa')
     Project.find()
         .then(projects => {
             res.status(HttpStatus.StatusCodes.OK).json(projects);
