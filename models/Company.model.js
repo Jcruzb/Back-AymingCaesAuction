@@ -10,6 +10,10 @@ const companySchema = new Schema({
         minLength: [3, 'El nombre debe tener al menos 3 caracteres'],
         maxLength: [100, 'El nombre puede tener hasta 100 caracteres']
     },
+    NifCif:{
+        type: String,
+        trim:true
+    }
     // Puedes agregar otros campos como dirección, logo, etc.
 }, {
     timestamps: true,
