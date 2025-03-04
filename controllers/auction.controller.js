@@ -1,14 +1,26 @@
 const Auction = require('../models/Auction.model');
+const Project = require('../models/Project.model');
 const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
 
 module.exports.createAuction = (req, res, next) => {
     Auction.create(req.body)
-        .then(auction => {
-            res.status(HttpStatus.StatusCodes.CREATED).json(auction);
-        })
-        .catch(next);
-};
+      .then(auction => {
+        // Se asume que req.body.project contiene el id del proyecto
+        return Project.findByIdAndUpdate(
+          auction.project,
+          { $push: { auction: auction._id } },
+          { new: true }
+        )
+        .then(updatedProject => {
+          if (!updatedProject) {
+            throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Proyecto no encontrado');
+          }
+          res.status(HttpStatus.StatusCodes.CREATED).json(auction);
+        });
+      })
+      .catch(next);
+  };
 
 module.exports.getAuctions = (req, res, next) => {
     Auction.find()
