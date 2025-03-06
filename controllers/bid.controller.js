@@ -1,11 +1,22 @@
 const Bid = require('../models/Bid.model');
+const Auction = require('../models/Auction.model');
 const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
 
 module.exports.createBid = (req, res, next) => {
     Bid.create(req.body)
         .then(bid => {
-            res.status(HttpStatus.StatusCodes.CREATED).json(bid);
+            // Actualizar la subasta asociada agregando el ID de la puja al array de bids
+            return Auction.findByIdAndUpdate(
+                bid.auction,
+                { $push: { bids: bid._id } }, // Agrega el ID de la puja al array de bids
+                { new: true }
+            ).then(auction => {
+                if (!auction) {
+                    throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Subasta no encontrada');
+                }
+                res.status(HttpStatus.StatusCodes.CREATED).json(bid);
+            });
         })
         .catch(next);
 };
