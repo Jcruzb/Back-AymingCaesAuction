@@ -1,10 +1,10 @@
 // auctionNotificationTemplate.js
 
 module.exports = function generateAuctionNotificationEmail(user, project) {
-    const appHost = process.env.APP_HOST || 'http://localhost:3000';
+    const appHost = process.env.APP_HOST;
     return `
       <div style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
-        <h1>¡Tu proyecto ha sido lanzado a subasta!</h1>
+        <h1>¡Un proyecto ha sido lanzado a subasta!</h1>
         <p><strong>Título:</strong> ${project.title}</p>
         <p><strong>Tipo de proyecto:</strong> ${project.projectType}</p>
         ${project.projectType === 'Estandarizado'
@@ -15,7 +15,7 @@ module.exports = function generateAuctionNotificationEmail(user, project) {
           <a href="${appHost}/projects/${project._id}" 
              style="display: inline-block; padding: 10px 20px; background-color: #007bff; 
                     color: #fff; text-decoration: none; border-radius: 5px;">
-            Ver Detalle en la Plataforma
+            Ver Detalle
           </a>
         </p>
       </div>

@@ -1,5 +1,6 @@
 const Auction = require('../models/Auction.model');
 const Project = require('../models/Project.model');
+const User = require('../models/User.model')
 const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
 const { sendAuctionNotificationEmail } = require('../config/nodemailer.config');
@@ -72,26 +73,26 @@ module.exports.notifyResults = (req, res, next) => {
 };
 
 module.exports.launchAuction = (req, res, next) => {
-    const { id } = req.params; // id de la subasta
-    Auction.findById(id)
+    const { id } = req.params;
+    // Actualizamos la subasta, estableciendo closed a false para "lanzarla"
+    Auction.findByIdAndUpdate(id, { closed: false }, { new: true })
       .then(auction => {
         if (!auction) {
           throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Subasta no encontrada');
         }
-        // Obtener el proyecto asociado a la subasta
+        // Obtenemos el proyecto asociado a la subasta
         return Project.findById(auction.project)
           .then(project => {
             if (!project) {
               throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Proyecto no encontrado');
             }
-            // Obtener todos los usuarios (clientes) para notificar
+            // Obtenemos todos los usuarios (clientes) para notificar
             return User.find({}).then(users => {
-              // Enviar email a cada usuario
               const emailPromises = users.map(user => {
                 return sendAuctionNotificationEmail(user, project);
               });
               return Promise.all(emailPromises).then(() => {
-                res.status(HttpStatus.StatusCodes.OK).json({ message: 'Subasta lanzada y notificaciones enviadas' });
+                res.status(HttpStatus.StatusCodes.OK).json({ message: 'Subasta lanzada y notificaciones enviadas', auction });
               });
             });
           });
