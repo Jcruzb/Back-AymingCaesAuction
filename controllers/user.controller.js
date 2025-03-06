@@ -7,7 +7,6 @@ module.exports.register = (req, res, next) => {
     User.create(req.body)
         .then(user => {
             res.status(HttpStatus.StatusCodes.CREATED).json(user);
-            sendValidationEmail(user)
         })
         .catch(next);
 };
