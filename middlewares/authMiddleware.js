@@ -16,7 +16,7 @@ module.exports.isAuthenticated = (req, res, next) => {
 
   const token = parts[1];
 
-  jwt.verify(token, process.env.JWT_SECRET || 'Super secret', (err, decodedToken) => {
+  jwt.verify(token, process.env.JWT_SECRET , (err, decodedToken) => {
     if (err) {
       return next(createError(HttpStatus.StatusCodes.UNAUTHORIZED, 'Invalid or expired token'));
     }
