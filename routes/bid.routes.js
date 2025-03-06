@@ -4,6 +4,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 router.post('/', authMiddleware.isAuthenticated, bidController.createBid);
 router.get('/', authMiddleware.isAuthenticated, bidController.getBids)
+router.get('/by-auction-and-company', authMiddleware.isAuthenticated, bidController.getBidForAuctionAndCompany);
 router.get('/:id', authMiddleware.isAuthenticated, bidController.getBid)
 router.put('/:id', authMiddleware.isAuthenticated, bidController.editBid)
 

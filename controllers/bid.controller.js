@@ -48,3 +48,26 @@ module.exports.editBid = (req, res, next) => {
         })
         .catch(() => next(createError(HttpStatus.StatusCodes.CONFLICT, 'Error updating bid')));
 }
+module.exports.getBidForAuctionAndCompany = (req, res, next) => {
+    const { auction, company } = req.query;
+    console.log('entraaaaaa'); // Esto se imprimirá ahora si se hace el request a la ruta correcta
+
+    if (!auction || !company) {
+        return res.status(HttpStatus.StatusCodes.BAD_REQUEST).json({ message: 'Se requieren auctionId y companyId' });
+    }
+
+    Bid.findOne({ auction, company })
+        .populate('client', 'name email') // Asegúrate de usar el nombre correcto del campo (en minúscula)
+        .populate('company', 'name cif')
+        .populate('auction', 'durationDays createdAt')
+        .lean()
+        .exec()
+        .then(bid => {
+            console.log(bid);
+            if (!bid) {
+                return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'No hay puja para esta compañía en esta subasta' });
+            }
+            res.status(HttpStatus.StatusCodes.OK).json(bid);
+        })
+        .catch(next);
+};
