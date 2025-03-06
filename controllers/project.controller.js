@@ -11,7 +11,6 @@ module.exports.createProject = (req, res, next) => {
 };
 
 module.exports.getProjects = (req, res, next) => {
-    console.log('Entraaaa')
     Project.find()
         .then(projects => {
             res.status(HttpStatus.StatusCodes.OK).json(projects);
@@ -61,3 +60,14 @@ module.exports.getProjectForClient = (req, res, next) => {
       })
       .catch(next);
   };
+
+
+
+module.exports.getProjectsForClient = (req, res, next) => {
+  Project.find()
+    .select('-savingsOwner') // Excluye el campo savingsOwner
+    .then(projects => {
+      res.status(HttpStatus.StatusCodes.OK).json(projects);
+    })
+    .catch(next);
+};
