@@ -13,4 +13,7 @@ router.put('/:id/close', authMiddleware.isAuthenticated, auctionController.close
 // Endpoint para marcar como notificados los resultados de la subasta
 router.put('/:id/notify', authMiddleware.isAuthenticated, auctionController.notifyResults);
 
+//Endpoint para lanzar la subasta
+router.put('/:id/launch', authMiddleware.isAuthenticated, auctionController.launchAuction)
+
 module.exports = router;

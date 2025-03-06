@@ -2,6 +2,7 @@ const Auction = require('../models/Auction.model');
 const Project = require('../models/Project.model');
 const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
+const { sendAuctionNotificationEmail } = require('../config/nodemailer.config');
 
 module.exports.createAuction = (req, res, next) => {
     Auction.create(req.body)
@@ -69,3 +70,31 @@ module.exports.notifyResults = (req, res, next) => {
         })
         .catch(() => next(createError(HttpStatus.StatusCodes.CONFLICT, 'Error notifying results')));
 };
+
+module.exports.launchAuction = (req, res, next) => {
+    const { id } = req.params; // id de la subasta
+    Auction.findById(id)
+      .then(auction => {
+        if (!auction) {
+          throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Subasta no encontrada');
+        }
+        // Obtener el proyecto asociado a la subasta
+        return Project.findById(auction.project)
+          .then(project => {
+            if (!project) {
+              throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Proyecto no encontrado');
+            }
+            // Obtener todos los usuarios (clientes) para notificar
+            return User.find({}).then(users => {
+              // Enviar email a cada usuario
+              const emailPromises = users.map(user => {
+                return sendAuctionNotificationEmail(user, project);
+              });
+              return Promise.all(emailPromises).then(() => {
+                res.status(HttpStatus.StatusCodes.OK).json({ message: 'Subasta lanzada y notificaciones enviadas' });
+              });
+            });
+          });
+      })
+      .catch(next);
+  };
