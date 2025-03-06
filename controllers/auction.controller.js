@@ -24,12 +24,19 @@ module.exports.createAuction = (req, res, next) => {
       .catch(next);
   };
 
-module.exports.getAuctions = (req, res, next) => {
+
+  module.exports.getAuctions = (req, res, next) => {
+    console.log('entraaaa')
     Auction.find()
-        .then(auctions => {
-            res.status(HttpStatus.StatusCodes.OK).json(auctions);
-        })
-        .catch(next);
+      .populate({
+        path: 'project',
+        select: 'title savingsGenerated durationDays createdAt closed',
+      })
+      .then(auctions => {
+        console.log(auctions)
+          res.status(HttpStatus.StatusCodes.OK).json(auctions);
+      })
+      .catch(next);
 };
 
 module.exports.getAuction = (req, res, next) => {
