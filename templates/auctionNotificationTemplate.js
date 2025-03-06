@@ -12,7 +12,7 @@ module.exports = function generateAuctionNotificationEmail(user, project) {
           : ''}
         <p><strong>Ahorro generado:</strong> ${project.savingsGenerated}</p>
         <p>
-          <a href="${appHost}/projects/${project._id}" 
+          <a href="${appHost}/#/project/${project._id}" 
              style="display: inline-block; padding: 10px 20px; background-color: #007bff; 
                     color: #fff; text-decoration: none; border-radius: 5px;">
             Ver Detalle

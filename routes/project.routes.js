@@ -7,5 +7,8 @@ router.get('/', authMiddleware.isAuthenticated, projectController.getProjects);
 router.get('/:id', authMiddleware.isAuthenticated, projectController.getProject);
 router.put('/:id', authMiddleware.isAuthenticated, projectController.updateProject);
 router.delete('/:id', authMiddleware.isAuthenticated, projectController.deleteProject);
+// routes/project.routes.js
+router.get('/public/:id', projectController.getProjectForClient);
+
 
 module.exports = router;

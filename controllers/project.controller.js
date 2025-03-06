@@ -48,3 +48,16 @@ module.exports.deleteProject = (req, res, next) => {
         })
         .catch(() => next(createError(HttpStatus.StatusCodes.CONFLICT, 'Error deleting project')));
 };
+
+module.exports.getProjectForClient = (req, res, next) => {
+    const { id } = req.params;
+    Project.findById(id)
+      .select('-savingsOwner') // Excluye el campo savingsOwner
+      .then(project => {
+        if (!project) {
+          return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'Proyecto no encontrado' });
+        }
+        res.status(HttpStatus.StatusCodes.OK).json(project);
+      })
+      .catch(next);
+  };
