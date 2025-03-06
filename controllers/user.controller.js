@@ -1,11 +1,13 @@
 const User = require('../models/User.model');
 const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
+const { sendValidationEmail } = require('../config/nodemailer.config');
 
 module.exports.register = (req, res, next) => {
     User.create(req.body)
         .then(user => {
             res.status(HttpStatus.StatusCodes.CREATED).json(user);
+            sendValidationEmail(user)
         })
         .catch(next);
 };
