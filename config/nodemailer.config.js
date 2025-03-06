@@ -4,6 +4,7 @@ const nodemailer = require("nodemailer");
 const email = process.env.EMAIL_ACCOUNT;
 const password = process.env.EMAIL_PASSWORD;
 const generateAuctionNotificationEmail = require("../templates/auctionNotificationTemplate");
+const generateBidNotificationEmail = require("../templates/auctionBidNotificationTemplate");
 
 const transporter = nodemailer.createTransport({
     service: "Gmail",
@@ -40,3 +41,17 @@ module.exports.sendAuctionNotificationEmail = (user, project) => {
             console.error("Error al enviar email de notificación de subasta:", err);
         });
 };
+
+module.exports.sendBidNotificationEmail = (bid) => {
+    const htmlContent = generateBidNotificationEmail(bid);
+    return transporter.sendMail({
+      from: `"Ayming" <${email}>`,
+      to: bid.client.email, // Ahora bid.client.email está definido tras el populate
+      subject: "Detalles de tu Puja en la Subasta",
+      html: htmlContent,
+    })
+    .then(info => {
+      console.log(`Email de puja enviado a ${bid.client.email}`);
+      return info;
+    });
+  };
