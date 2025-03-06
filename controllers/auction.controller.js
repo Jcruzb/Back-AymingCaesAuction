@@ -86,8 +86,8 @@ module.exports.launchAuction = (req, res, next) => {
             if (!project) {
               throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Proyecto no encontrado');
             }
-            // Obtenemos todos los usuarios (clientes) para notificar
-            return User.find({}).then(users => {
+            // Obtenemos sólo los usuarios con rol "usuario" para notificar
+            return User.find({ role: 'usuario' }).then(users => {
               const emailPromises = users.map(user => {
                 return sendAuctionNotificationEmail(user, project);
               });

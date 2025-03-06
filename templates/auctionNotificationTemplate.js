@@ -10,7 +10,7 @@ module.exports = function generateAuctionNotificationEmail(user, project) {
         ${project.projectType === 'Estandarizado'
           ? `<p><strong>Proyecto estandarizado:</strong> ${project.standardizedProject}</p>`
           : ''}
-        <p><strong>Ahorro generado:</strong> ${project.savingsGenerated}</p>
+        <p><strong>Ahorro generado:</strong> ${project.savingsGenerated.toLocaleString('es-ES')} MWh</p>
         <p>
           <a href="${appHost}/#/project/${project._id}" 
              style="display: inline-block; padding: 10px 20px; background-color: #007bff; 

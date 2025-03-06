@@ -31,7 +31,7 @@ module.exports.sendAuctionNotificationEmail = (user, project) => {
         .sendMail({
             from: `"Ayming" <${email}>`,
             to: user.email,
-            subject: "Tu proyecto ha sido lanzado a subasta",
+            subject: "Un proyecto ha sido lanzado a subasta",
             html: htmlContent,
         })
         .then(() => {
