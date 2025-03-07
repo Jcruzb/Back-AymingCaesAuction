@@ -29,6 +29,8 @@ const standarProjectRoutes = require('./routes/standarProject.routes')
 app.use('/standarProjects', standarProjectRoutes)
 const companyRoutes = require('./routes/company.routes');
 app.use('/companies', companyRoutes);
+const dashboardRoutes = require('./routes/dashboard.routes')
+app.use('/dashboard', dashboardRoutes)
 
 
 const PORT = process.env.PORT
