@@ -6,6 +6,7 @@ router.post('/', authMiddleware.isAuthenticated, auctionController.createAuction
 router.get('/', authMiddleware.isAuthenticated, auctionController.getAuctions);
 router.get('/:id', authMiddleware.isAuthenticated, auctionController.getAuction);
 router.put('/:id', authMiddleware.isAuthenticated, auctionController.updateAuction);
+router.get('/detail/:id', authMiddleware.isAuthenticated, auctionController.getAuctionDetail);
 
 // Endpoint para cerrar la subasta (cambiar el estado a 'closed')
 router.put('/:id/close', authMiddleware.isAuthenticated, auctionController.closeAuction);

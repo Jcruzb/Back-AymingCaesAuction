@@ -1,6 +1,7 @@
 const Auction = require('../models/Auction.model');
 const Project = require('../models/Project.model');
 const User = require('../models/User.model')
+const Bid = require('../models/Bid.model')
 const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
 const { sendAuctionNotificationEmail, sendAuctionClosedNotificationEmail } = require('../config/nodemailer.config');
@@ -56,6 +57,63 @@ module.exports.updateAuction = (req, res, next) => {
         })
         .catch(() => next(createError(HttpStatus.StatusCodes.CONFLICT, 'Error updating auction')));
 };
+
+module.exports.getAuctionDetail = (req, res, next) => {
+    const { id } = req.params; // ID de la subasta
+    const user = req.currentUser; // Usuario autenticado
+
+    console.log(user);
+
+    if (user.role === 'administrador') {
+        // ADMINISTRADOR VE TODAS LAS PUJAS con datos completos
+        Auction.findById(id)
+            .populate({
+                path: 'project',
+                select: 'title savingsGenerated durationDays createdAt closed'
+            })
+            .populate({
+                path: 'bids',
+                populate: [
+                    { path: 'client', select: 'name email' },
+                    { path: 'company', select: 'name cif' }
+                ]
+            })
+            .lean()
+            .exec()
+            .then(auction => {
+                if (!auction) {
+                    return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'Subasta no encontrada' });
+                }
+                res.status(HttpStatus.StatusCodes.OK).json(auction);
+            })
+            .catch(next);
+    } else {
+        // USUARIO SOLO VE SU PUJA
+        Bid.findOne({ auction: id, company: user.company })
+            .populate({
+                path: 'auction',
+                populate: {
+                    path: 'project',
+                    select: 'title savingsGenerated durationDays createdAt closed'
+                }
+            })
+            .populate('client', 'name email')
+            .populate('company', 'name cif')
+            .lean()
+            .exec()
+            .then(bid => {
+                if (!bid) {
+                    return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'No tienes una puja registrada en esta subasta' });
+                }
+                res.status(HttpStatus.StatusCodes.OK).json({
+                    auction: bid.auction,
+                    bids: [bid]
+                });
+            })
+            .catch(next);
+    }
+};
+
 
 module.exports.closeAuction = (req, res, next) => {
     const { id } = req.params;

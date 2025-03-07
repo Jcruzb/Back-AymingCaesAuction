@@ -73,7 +73,7 @@ module.exports = function generateAuctionClosedNotificationEmail(user, project) 
         </div>
         <div class="footer">
           Gracias por participar en la subasta.<br>
-          <a href="${appHost}/projects/${project._id}">Ver Detalle del Proyecto</a>
+          <a href="${appHost}/project/${project._id}">Ver Detalle del Proyecto</a>
         </div>
       </div>
     </body>
