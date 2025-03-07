@@ -6,6 +6,10 @@ const password = process.env.EMAIL_PASSWORD;
 const generateAuctionNotificationEmail = require("../templates/auctionNotificationTemplate");
 const generateBidNotificationEmail = require("../templates/auctionBidNotificationTemplate");
 const generateAuctionClosedNotificationEmail = require("../templates/auctionClosedNotificationTemplate");
+const generateAuctionResultWinnerEmail = require("../templates/auctionResultWinnerTemplate");
+const generateAuctionResultTieEmail = require("../templates/auctionResultTieTemplate");
+const generateAuctionResultNonWinnerEmail = require("../templates/auctionResultNonWinnerTemplate");
+
 
 const transporter = nodemailer.createTransport({
     service: "Gmail",
@@ -71,3 +75,42 @@ module.exports.sendBidNotificationEmail = (bid) => {
         return info;
       });
   };
+
+  module.exports.sendAuctionResultWinnerEmail = (user, project, bid) => {
+    const htmlContent = generateAuctionResultWinnerEmail(user, project, bid);
+    return transporter.sendMail({
+        from: `"Ayming" <${email}>`,
+        to: user.email,
+        subject: "¡Felicidades! Ganaste la subasta",
+        html: htmlContent,
+    }).then(info => {
+        console.log(`Email ganador enviado a ${user.email}`);
+        return info;
+    });
+};
+
+module.exports.sendAuctionResultTieEmail = (user, project, bid) => {
+    const htmlContent = generateAuctionResultTieEmail(user, project, bid);
+    return transporter.sendMail({
+        from: `"Ayming" <${email}>`,
+        to: user.email,
+        subject: "Empate en la subasta",
+        html: htmlContent,
+    }).then(info => {
+        console.log(`Email de empate enviado a ${user.email}`);
+        return info;
+    });
+};
+
+module.exports.sendAuctionResultNonWinnerEmail = (user, project, bid) => {
+    const htmlContent = generateAuctionResultNonWinnerEmail(user, project, bid);
+    return transporter.sendMail({
+        from: `"Ayming" <${email}>`,
+        to: user.email,
+        subject: "Resultado de la subasta",
+        html: htmlContent,
+    }).then(info => {
+        console.log(`Email no ganador enviado a ${user.email}`);
+        return info;
+    });
+};

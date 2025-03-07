@@ -4,7 +4,13 @@ const User = require('../models/User.model')
 const Bid = require('../models/Bid.model')
 const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
-const { sendAuctionNotificationEmail, sendAuctionClosedNotificationEmail } = require('../config/nodemailer.config');
+const { 
+    sendAuctionNotificationEmail, 
+    sendAuctionClosedNotificationEmail, 
+    sendAuctionResultWinnerEmail, 
+    sendAuctionResultTieEmail, 
+    sendAuctionResultNonWinnerEmail  
+  } = require('../config/nodemailer.config');
 
 module.exports.createAuction = (req, res, next) => {
     Auction.create(req.body)
@@ -152,14 +158,67 @@ module.exports.closeAuction = (req, res, next) => {
       .catch(next);
   };
 
-module.exports.notifyResults = (req, res, next) => {
-    const { id } = req.params;
-    Auction.findByIdAndUpdate(id, { resultsNotified: true }, { new: true })
-        .then(auction => {
-            if (!auction) return res.status(HttpStatus.StatusCodes.NOT_FOUND).send();
-            res.status(HttpStatus.StatusCodes.OK).json({ message: 'Results notified successfully', auction });
-        })
-        .catch(() => next(createError(HttpStatus.StatusCodes.CONFLICT, 'Error notifying results')));
+  module.exports.notifyResults = (req, res, next) => {
+    const { id } = req.params; // ID de la subasta
+
+    Auction.findById(id)
+      .populate({
+        path: 'bids',
+        populate: [
+          { path: 'client', select: 'name email' },
+          { path: 'company', select: 'name cif' }
+        ]
+      })
+      .populate({
+        path: 'project',
+        select: 'title savingsGenerated durationDays createdAt closed'
+      })
+      .lean()
+      .exec()
+      .then(auction => {
+          if (!auction) {
+              return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'Subasta no encontrada' });
+          }
+          
+          const bids = auction.bids;
+          if (!bids || bids.length === 0) {
+              return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'No hay pujas para esta subasta' });
+          }
+
+          // Determinar el mayor precio de puja
+          const maxBidPrice = Math.max(...bids.map(bid => bid.bidPrice));
+          // Determinar los ganadores (podría ser empate)
+          const winners = bids.filter(bid => bid.bidPrice === maxBidPrice);
+          const tie = winners.length > 1;
+
+          // Preparar las promesas para enviar correos según el resultado
+          const emailPromises = bids.map(bid => {
+            if (winners.find(winner => winner._id.toString() === bid._id.toString())) {
+                // Es ganador
+                if (tie) {
+                    return sendAuctionResultTieEmail(bid.client, auction.project, bid);
+                } else {
+                    return sendAuctionResultWinnerEmail(bid.client, auction.project, bid);
+                }
+            } else {
+                return sendAuctionResultNonWinnerEmail(bid.client, auction.project, bid);
+            }
+          });
+
+          // Actualizar la subasta para marcar que se han notificado los resultados
+          Auction.findByIdAndUpdate(id, { resultsNotified: true }, { new: true })
+            .then(updatedAuction => {
+              Promise.all(emailPromises)
+                .then(() => {
+                  res.status(HttpStatus.StatusCodes.OK).json({ message: 'Resultados notificados', auction: updatedAuction });
+                })
+                .catch(err => {
+                  console.error("Error enviando emails de resultados:", err);
+                  res.status(HttpStatus.StatusCodes.OK).json({ message: 'Resultados notificados, pero hubo errores al enviar algunos emails', auction: updatedAuction });
+                });
+            });
+      })
+      .catch(next);
 };
 
 module.exports.launchAuction = (req, res, next) => {
