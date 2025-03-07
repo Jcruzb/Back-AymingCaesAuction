@@ -5,6 +5,7 @@ const email = process.env.EMAIL_ACCOUNT;
 const password = process.env.EMAIL_PASSWORD;
 const generateAuctionNotificationEmail = require("../templates/auctionNotificationTemplate");
 const generateBidNotificationEmail = require("../templates/auctionBidNotificationTemplate");
+const generateAuctionClosedNotificationEmail = require("../templates/auctionClosedNotificationTemplate");
 
 const transporter = nodemailer.createTransport({
     service: "Gmail",
@@ -54,4 +55,19 @@ module.exports.sendBidNotificationEmail = (bid) => {
       console.log(`Email de puja enviado a ${bid.client.email}`);
       return info;
     });
+  };
+
+  module.exports.sendAuctionClosedNotificationEmail = (user, project) => {
+    const htmlContent = generateAuctionClosedNotificationEmail(user, project);
+    return transporter
+      .sendMail({
+        from: `"Ayming" <${email}>`,
+        to: user.email,
+        subject: "Subasta Cerrada – Próximos Resultados",
+        html: htmlContent,
+      })
+      .then((info) => {
+        console.log(`Email de subasta cerrada enviado a ${user.email}`);
+        return info;
+      });
   };
