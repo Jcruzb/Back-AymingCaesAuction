@@ -11,7 +11,6 @@ module.exports.createStandardProject = (req, res, next) => {
 };
 
 module.exports.getStandardProjects = (req, res, next) => {
-    console.log('entraaaaa a get standar projects')
     StandardProject.find()
         .then(standarProject => {
             res.status(HttpStatus.StatusCodes.OK).json(standarProject);

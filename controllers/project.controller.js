@@ -1,14 +1,29 @@
 const Project = require('../models/Project.model');
 const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
+const { uploadFile } = require('../config/cloudinary.config');
+
 
 module.exports.createProject = (req, res, next) => {
-    Project.create(req.body)
-        .then(project => {
-            res.status(HttpStatus.StatusCodes.CREATED).json(project);
+    // Extraemos el body del proyecto
+    const projectData = { ...req.body };
+  
+    // Si se envía un archivo (por ejemplo, imagen del proyecto), se sube a Cloudinary.
+    if (req.file) {
+      uploadFile(req.file.buffer, 'projects')
+        .then(result => {
+          // Asigna la URL del archivo subido al campo image del proyecto (o el nombre de campo que decidas)
+          projectData.image = result.secure_url;
+          return Project.create(projectData);
         })
-        .catch(next);
-};
+        .then(project => res.status(HttpStatus.StatusCodes.CREATED).json(project))
+        .catch(err => console.log(err));
+    } else {
+      Project.create(projectData)
+        .then(project => res.status(HttpStatus.StatusCodes.CREATED).json(project))
+        .catch(err => console.log(err));
+    }
+  };
 
 module.exports.getProjects = (req, res, next) => {
     Project.find()
@@ -27,17 +42,35 @@ module.exports.getProject = (req, res, next) => {
         })
         .catch(next);
 };
-
 module.exports.updateProject = (req, res, next) => {
     const { id } = req.params;
-    Project.findByIdAndUpdate(id, req.body, { new: true })
-        .then(project => {
-            if (!project) return res.status(HttpStatus.StatusCodes.NOT_FOUND).send();
-            res.status(HttpStatus.StatusCodes.OK).json(project);
+    const projectData = { ...req.body };
+  
+    // Si se envía un archivo nuevo, se sube a Cloudinary
+    if (req.file) {
+      uploadFile(req.file.buffer, 'projects')
+        .then(result => {
+          projectData.image = result.secure_url;
+          return Project.findByIdAndUpdate(id, projectData, { new: true });
         })
-        .catch(() => next(createError(HttpStatus.StatusCodes.CONFLICT, 'Error updating project')));
-};
-
+        .then(project => {
+          if (!project) {
+            throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Proyecto no encontrado');
+          }
+          res.status(HttpStatus.StatusCodes.OK).json(project);
+        })
+        .catch(next);
+    } else {
+      Project.findByIdAndUpdate(id, projectData, { new: true })
+        .then(project => {
+          if (!project) {
+            throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Proyecto no encontrado');
+          }
+          res.status(HttpStatus.StatusCodes.OK).json(project);
+        })
+        .catch(next);
+    }
+  };
 module.exports.deleteProject = (req, res, next) => {
     const { id } = req.params;
     Project.findByIdAndDelete(id)
