@@ -3,7 +3,7 @@ const HttpStatus = require('http-status-codes');
 const createError = require('http-errors');
 
 module.exports.createStandardProject = (req, res, next) => {
-    Project.create(req.body)
+    StandardProject.create(req.body)
         .then(standarProject => {
             res.status(HttpStatus.StatusCodes.CREATED).json(standarProject);
         })
@@ -11,7 +11,8 @@ module.exports.createStandardProject = (req, res, next) => {
 };
 
 module.exports.getStandardProjects = (req, res, next) => {
-    Project.find()
+    console.log('entraaaaa a get standar projects')
+    StandardProject.find()
         .then(standarProject => {
             res.status(HttpStatus.StatusCodes.OK).json(standarProject);
         })
@@ -20,7 +21,7 @@ module.exports.getStandardProjects = (req, res, next) => {
 
 module.exports.getStandardProject = (req, res, next) => {
     const { id } = req.params;
-    Project.findById(id)
+    StandardProject.findById(id)
         .then(standarProject => {
             if (!standarProject) return res.status(HttpStatus.StatusCodes.NOT_FOUND).send();
             res.status(HttpStatus.StatusCodes.OK).json(standarProject);
@@ -30,7 +31,7 @@ module.exports.getStandardProject = (req, res, next) => {
 
 module.exports.updateStandardProject = (req, res, next) => {
     const { id } = req.params;
-    Project.findByIdAndUpdate(id, req.body, { new: true })
+    StandardProject.findByIdAndUpdate(id, req.body, { new: true })
         .then(standarProject => {
             if (!standarProject) return res.status(HttpStatus.StatusCodes.NOT_FOUND).send();
             res.status(HttpStatus.StatusCodes.OK).json(standarProject);
@@ -40,7 +41,7 @@ module.exports.updateStandardProject = (req, res, next) => {
 
 module.exports.deleteStandardProject = (req, res, next) => {
     const { id } = req.params;
-    Project.findByIdAndDelete(id)
+    StandardProject.findByIdAndDelete(id)
         .then(standarProject => {
             if (!standarProject) return res.status(HttpStatus.StatusCodes.NOT_FOUND).send();
             res.status(HttpStatus.StatusCodes.OK).json({ message: 'Standar project deleted successfully' });
