@@ -84,5 +84,5 @@ module.exports.getBidForAuctionAndCompany = (req, res, next) => {
             }
             res.status(HttpStatus.StatusCodes.OK).json(bid);
         })
-        .catch(next);
+        .catch(err => console.log(err));
 };

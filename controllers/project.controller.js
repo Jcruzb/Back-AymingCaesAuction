@@ -93,7 +93,11 @@ module.exports.deleteProject = (req, res, next) => {
 module.exports.getProjectForClient = (req, res, next) => {
     const { id } = req.params;
     Project.findById(id)
-        .select('-savingsOwner') // Excluye el campo savingsOwner
+        .select('-savingsOwner')
+        .populate({
+            path:'auction',
+            select:'closed'
+        }) // Excluye el campo savingsOwner
         .then(project => {
             if (!project) {
                 return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'Proyecto no encontrado' });
