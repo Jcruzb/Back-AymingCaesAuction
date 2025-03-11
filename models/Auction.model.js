@@ -15,6 +15,10 @@ const AuctionSchema = new Schema({
         type: Number,
         required: [true, 'Se requiere la duración de la subasta en días']
     },
+    launched:{
+        type: Boolean,
+        default:false
+    },
     closed: {
         type: Boolean,
         default: false

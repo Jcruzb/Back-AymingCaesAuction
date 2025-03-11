@@ -224,7 +224,7 @@ module.exports.closeAuction = (req, res, next) => {
 module.exports.launchAuction = (req, res, next) => {
     const { id } = req.params;
     // Actualizamos la subasta, estableciendo closed a false para "lanzarla"
-    Auction.findByIdAndUpdate(id, { closed: false }, { new: true })
+    Auction.findByIdAndUpdate(id, { closed: false, launched: true }, { new: true })
       .then(auction => {
         if (!auction) {
           throw createError(HttpStatus.StatusCodes.NOT_FOUND, 'Subasta no encontrada');
