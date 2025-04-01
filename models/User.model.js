@@ -30,8 +30,7 @@ const userSchema = new Schema({
     },
     company:{
         type: Schema.Types.ObjectId,
-        ref: 'Company',
-        required:[true, 'Se requiere seleccionar la empresa a la que pertenece']
+        ref: 'Company'
     },
     role: {
         type: String,
