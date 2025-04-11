@@ -16,6 +16,7 @@ module.exports.createAuction = (req, res, next) => {
   const {
     project,
     durationDays,
+    minBid, // Valor de puja mínima
     minBidIncrement = 0.5,
     notificationConfig = { dailyNotification: true, finalDayNotification: { active: true, frequencyHours: 1 } }
   } = req.body;
@@ -28,6 +29,7 @@ module.exports.createAuction = (req, res, next) => {
   Auction.create({
     project,
     durationDays,
+    minBid,
     minBidIncrement,
     notificationConfig
   })

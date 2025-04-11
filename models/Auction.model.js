@@ -7,6 +7,7 @@ const AuctionSchema = new Schema({
     durationDays: { type: Number, required: [true, 'Se requiere la duración de la subasta en días'] },
     launched: { type: Boolean, default: false },
     closed: { type: Boolean, default: false },
+    minBid: { type: Number, required: [true, 'Se requiere la puja mínima'] },
     bids: [{ type: Schema.Types.ObjectId, ref: 'Bid' }],
     resultsNotified: { type: Boolean, default: false },
     isTieBreak: { type: Boolean, default: false },
