@@ -30,7 +30,8 @@ module.exports.getProjects = (req, res, next) => {
     Project.find()
         .populate({
             path: 'auction',
-            select: 'launched' // Solo populamos el campo 'launched'
+            select: ['launched','closed']
+             // Solo populamos el campo 'launched'
         })
         .then(projects => {
             res.status(HttpStatus.StatusCodes.OK).json(projects);
