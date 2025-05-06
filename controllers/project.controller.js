@@ -46,6 +46,10 @@ module.exports.getProject = (req, res, next) => {
         path: 'auction',
         select: 'durationDays'
     })
+    .populate({
+        path:'standardizedProject',
+        select:['name', 'code']
+    })
         .then(project => {
             if (!project) return res.status(HttpStatus.StatusCodes.NOT_FOUND).send();
             res.status(HttpStatus.StatusCodes.OK).json(project);
@@ -98,11 +102,16 @@ module.exports.getProjectForClient = (req, res, next) => {
         .populate({
             path:'auction',
             select:'closed'
-        }) // Excluye el campo savingsOwner
+        })
+        .populate({
+            path:'standardizedProject',
+            select:['name', 'code']
+        })
         .then(project => {
             if (!project) {
                 return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'Proyecto no encontrado' });
             }
+            console.log(project)
             res.status(HttpStatus.StatusCodes.OK).json(project);
         })
         .catch(next);
@@ -112,7 +121,11 @@ module.exports.getProjectForClient = (req, res, next) => {
 
 module.exports.getProjectsForClient = (req, res, next) => {
     Project.find()
-        .select('-savingsOwner') // Excluye el campo savingsOwner
+        .select('-savingsOwner')
+        .populate({
+            path:'auction',
+            select:'closed'
+        }) // Excluye el campo savingsOwner
         .then(projects => {
             res.status(HttpStatus.StatusCodes.OK).json(projects);
         })
