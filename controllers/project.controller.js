@@ -101,17 +101,21 @@ module.exports.getProjectForClient = (req, res, next) => {
         .select('-savingsOwner')
         .populate({
             path:'auction',
-            select:'closed'
+            select:['closed', 'minBid', 'bids', 'minBidIncrement'],
+            populate: {
+                path: 'bids',
+                select: ['_id', 'bidPrice']
+            }
         })
         .populate({
             path:'standardizedProject',
             select:['name', 'code']
         })
+        
         .then(project => {
             if (!project) {
                 return res.status(HttpStatus.StatusCodes.NOT_FOUND).json({ message: 'Proyecto no encontrado' });
             }
-            console.log(project)
             res.status(HttpStatus.StatusCodes.OK).json(project);
         })
         .catch(next);
