@@ -72,8 +72,8 @@ module.exports.getBidForAuctionAndCompany = (req, res, next) => {
         return res.status(HttpStatus.StatusCodes.BAD_REQUEST).json({ message: 'Se requieren auctionId y companyId' });
     }
 
-    Bid.findOne({ auction, company })
-        .populate('client', 'name email') // Asegúrate de usar el nombre correcto del campo (en minúscula)
+    Bid.find({ auction, company })
+        .populate('client', 'name email') 
         .populate('company', 'name cif')
         .populate('auction', 'durationDays createdAt')
         .lean()
