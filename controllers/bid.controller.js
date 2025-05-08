@@ -73,7 +73,7 @@ module.exports.getBidForAuctionAndCompany = (req, res, next) => {
     }
 
     Bid.find({ auction, company })
-        .populate('client', 'name email') 
+        .populate('client', 'name email') // Asegúrate de usar el nombre correcto del campo (en minúscula)
         .populate('company', 'name cif')
         .populate('auction', 'durationDays createdAt')
         .lean()
