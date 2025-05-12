@@ -9,6 +9,9 @@ const generateAuctionClosedNotificationEmail = require("../templates/auctionClos
 const generateAuctionResultWinnerEmail = require("../templates/auctionResultWinnerTemplate");
 const generateAuctionResultTieEmail = require("../templates/auctionResultTieTemplate");
 const generateAuctionResultNonWinnerEmail = require("../templates/auctionResultNonWinnerTemplate");
+const generateDailySummaryTemplate = require('../templates/dailyProjectNotificationTemplate');
+const generateFinalDaySuperadaTemplate = require('../templates/finalDayNotificationTemplate');
+
 
 
 const transporter = nodemailer.createTransport({
@@ -114,3 +117,35 @@ module.exports.sendAuctionResultNonWinnerEmail = (user, project, bid) => {
         return info;
     });
 };
+
+module.exports.sendDailySummaryEmail = (user, auctionSummaries) => {
+    const htmlContent = generateDailySummaryTemplate(user, auctionSummaries);
+  
+    return transporter.sendMail({
+      from: `"Ayming" <${email}>`,
+      to: user.email,
+      subject: 'Resumen diario de tus subastas activas',
+      html: htmlContent,
+    }).then(info => {
+      console.log(`[EMAIL] Resumen diario enviado a ${user.email}`);
+      return info;
+    }).catch(err => {
+      console.error(`[EMAIL ERROR] Falló resumen diario:`, err);
+    });
+  };
+  
+  module.exports.sendFinalDaySuperadaEmail = (user, project, bid) => {
+    const htmlContent = generateFinalDaySuperadaTemplate(user, project, bid);
+  
+    return transporter.sendMail({
+      from: `"Ayming" <${email}>`,
+      to: user.email,
+      subject: `Último día: tu puja fue superada`,
+      html: htmlContent,
+    }).then(info => {
+      console.log(`[EMAIL] Último día enviado a ${user.email}`);
+      return info;
+    }).catch(err => {
+      console.error(`[EMAIL ERROR] Falló notificación de último día:`, err);
+    });
+  };

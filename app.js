@@ -1,5 +1,6 @@
 require('./config/db.config')
 require('dotenv').config()
+require('./config/notification.cron');
 
 const express = require('express')
 const loger = require('morgan')
