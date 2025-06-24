@@ -5,6 +5,8 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 // Proteger con autenticación
 router.get('/admin', authMiddleware.isAuthenticated, dashboardController.getAdminDashboard);
+router.get('/admin/auctionsByMonth', dashboardController.getAuctionsByMonthByYear);
+
 router.get('/user', authMiddleware.isAuthenticated, dashboardController.getUserDashboard);
 
 module.exports = router;

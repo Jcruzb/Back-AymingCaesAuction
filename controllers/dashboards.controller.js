@@ -44,6 +44,24 @@ module.exports.getAdminDashboard = async (req, res, next) => {
   }
 };
 
+module.exports.getAuctionsByMonthByYear = async (req, res, next) => {
+  try {
+    const year = parseInt(req.query.year, 10) || new Date().getFullYear();
+    const start = new Date(year, 0, 1);
+    const end = new Date(year + 1, 0, 1);
+
+    const auctionsByMonth = await Auction.aggregate([
+      { $match: { createdAt: { $gte: start, $lt: end } } },
+      { $group: { _id: { $month: '$createdAt' }, count: { $sum: 1 } } },
+      { $sort: { '_id': 1 } }
+    ]);
+
+    res.status(HttpStatus.StatusCodes.OK).json(auctionsByMonth);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports.getUserDashboard = async (req, res, next) => {
     try {
       // Usar el id del usuario para buscar su registro completo
