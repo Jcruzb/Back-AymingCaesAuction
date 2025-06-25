@@ -7,31 +7,23 @@ const createError = require('http-errors');
 
 module.exports.getAdminDashboard = async (req, res, next) => {
   try {
-    // Total de subastas creadas
+    // Total de subastas
     const totalAuctions = await Auction.countDocuments({});
 
-    // Subastas por mes (agrupadas por mes de createdAt)
+    // Subastas por mes (sin cambios)
     const auctionsByMonth = await Auction.aggregate([
-      {
-        $group: {
-          _id: { $month: "$createdAt" },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { "_id": 1 } }
+      { $group: { _id: { $month: '$createdAt' }, count: { $sum: 1 } } },
+      { $sort: { '_id': 1 } }
     ]);
 
-    // Estadísticas de pujas por subasta:
-    // Para cada subasta, contamos las pujas, sumamos los montos y calculamos el máximo bidPrice.
+    // Estadísticas de pujas por subasta, con título de proyecto
     const bidsPerAuction = await Bid.aggregate([
-      {
-        $group: {
-          _id: "$auction",
-          count: { $sum: 1 },
-          totalBidAmount: { $sum: "$bidPrice" },
-          maxBid: { $max: "$bidPrice" }
-        }
-      }
+      { $group: { _id: '$auction', count: { $sum: 1 }, totalBidAmount: { $sum: '$bidPrice' }, maxBid: { $max: '$bidPrice' } } },
+      { $lookup: { from: 'auctions', localField: '_id', foreignField: '_id', as: 'auction' } },
+      { $unwind: '$auction' },
+      { $lookup: { from: 'projects', localField: 'auction.project', foreignField: '_id', as: 'project' } },
+      { $unwind: '$project' },
+      { $project: { projectTitle: '$project.title', count: 1, totalBidAmount: 1, maxBid: 1 } }
     ]);
 
     res.status(HttpStatus.StatusCodes.OK).json({
